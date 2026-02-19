@@ -51,10 +51,10 @@ class BookModel {
 
         $newBook = [
             'id' => $maxId + 1,
-            'title' => $data['title'],
-            'author' => $data['author'],
-            'isbn' => $data['isbn'] ?? null,
-            'year' => $data['year'] ?? null
+            'title' => strip_tags(trim($data['title'])),
+            'author' => strip_tags(trim($data['author'])),
+            'isbn' => isset($data['isbn']) ? strip_tags(trim($data['isbn'])) : null,
+            'year' => isset($data['year']) ? (int)$data['year'] : null
         ];
         $books[] = $newBook;
         $this->saveData($books);
@@ -66,10 +66,10 @@ class BookModel {
         $books = $this->readData();
         foreach ($books as &$book) {
             if ($book['id'] == $id) {
-                if (isset($data['title']))  $book['title']  = $data['title'];
-                if (isset($data['author'])) $book['author'] = $data['author'];
-                if (isset($data['isbn']))   $book['isbn']   = $data['isbn'];
-                if (isset($data['year']))   $book['year']   = $data['year'];
+                if (isset($data['title']))  $book['title']  = strip_tags(trim($data['title']));
+                if (isset($data['author'])) $book['author'] = strip_tags(trim($data['author']));
+                if (isset($data['isbn']))   $book['isbn']   = strip_tags(trim($data['isbn']));
+                if (isset($data['year']))   $book['year']   = (int)$data['year'];
                 $this->saveData($books);
                 return $book;
             }

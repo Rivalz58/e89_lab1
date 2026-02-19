@@ -14,6 +14,8 @@ class BookController {
     // Point d'entrée : route selon la méthode HTTP et la présence d'un ID
     public function handleRequest($id = null) {
         header('Content-Type: application/json');
+        header('X-Content-Type-Options: nosniff');
+        header('X-Frame-Options: DENY');
         $method = $_SERVER['REQUEST_METHOD'];
 
         switch ($method) {
@@ -66,7 +68,13 @@ class BookController {
 
     // POST / — crée un nouveau livre
     public function store() {
-        $data = json_decode(file_get_contents('php://input'), true);
+        $raw = file_get_contents('php://input', false, null, 0, 1048576); // limite à 1 Mo
+        $data = json_decode($raw, true);
+        if (json_last_error() !== JSON_ERROR_NONE) {
+            http_response_code(400);
+            echo json_encode(['success' => false, 'message' => 'Invalid JSON']);
+            return;
+        }
         $errors = $this->validate($data);
 
         if (!empty($errors)) {
@@ -97,7 +105,13 @@ class BookController {
             return;
         }
 
-        $data = json_decode(file_get_contents('php://input'), true);
+        $raw = file_get_contents('php://input', false, null, 0, 1048576); // limite à 1 Mo
+        $data = json_decode($raw, true);
+        if (json_last_error() !== JSON_ERROR_NONE) {
+            http_response_code(400);
+            echo json_encode(['success' => false, 'message' => 'Invalid JSON']);
+            return;
+        }
         $errors = $this->validate($data, true);
 
         if (!empty($errors)) {
